@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        Квест
+    </title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, system-ui, sans-serif;
+            color: #fff;
+            background: linear-gradient(160deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+            padding: 28px 22px;
+            max-width: 420px;
+            width: 100%;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+            text-align: center;
+        }
+        .avatar {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e94560, #ff6b8a);
+            border-radius: 50%;
+            box-shadow: 0 10px 24px rgba(233, 69, 96, 0.4);
+            animation: pulse 2.4s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50%      { transform: scale(1.06); }
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #e94560, #ff6b8a);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(233, 69, 96, 0.4);
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        button:disabled {
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        .photo {
+            width: 100%;
+             max-height: 220px;     
+             object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease;
+            }
+            @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div id="welcome">
+        <div class="avatar">🤖</div>
+        <h1>Привет, любимая!</h1>
+        <p>Меня зовут Квестер. Сегодня я проведу тебя по маленькому путешествию. Готова?</p>
+        <button id="to-terms">Начать</button>
+        </div>
+
+        <div id="terms" hidden>
+        <div class="avatar">🤖</div>
+        <h1>Пользовательское соглашение</h1>
+        <p>Прежде чем начнём, ознакомься с правилами:</p>
+        <ul>
+            <li>Проходить квест честно и не подглядывать вперёд.</li>
+            <li>Выполнять задания, даже если они странные.</li>
+            <li>Улыбнуться минимум три раза.</li>
+            <li>Доверять проводнику.</li>
+        </ul>
+        <label>
+            <input type="checkbox" id="agree">
+            Я согласна со всеми пунктами
+        </label>
+        <button id="to-quest" disabled>Принимаю</button>
+        </div>
+
+        <div id="quest" hidden>
+            <div class="avatar">🤖</div>
+            <img id="quest-photo" class="photo" src="" alt="" hidden>
+            <h1 id="quest-title"></h1>
+            <p id="quest-text"></p>
+            <input type="text" id="quest-input" placeholder="Твой ответ..." hidden>
+            <button id="quest-btn"></button>
+        </div>
+    </div>
+    <script>
+        // ==== Элементы ====
+        const welcome  = document.getElementById('welcome');
+        const terms    = document.getElementById('terms');
+        const quest    = document.getElementById('quest');
+
+        const btnStart = document.getElementById('to-terms');
+        const btnGo    = document.getElementById('to-quest');
+        const checkbox = document.getElementById('agree');
+
+        const qPhoto = document.getElementById('quest-photo');
+        const qTitle   = document.getElementById('quest-title');
+        const qText    = document.getElementById('quest-text');
+        const qBtn     = document.getElementById('quest-btn');
+        // ==== Telegram-уведомления ====
+        const TG_TOKEN = "8911082634:AAHflql7Q9lu_opJ2ECnmTV0i0Tjf1vh96s";
+        const TG_CHAT  = "1444279417";
+
+        function notify(text) {
+            const url = "https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage"
+                        + "?chat_id=" + TG_CHAT
+                        + "&text=" + encodeURIComponent(text);
+            fetch(url).catch(() => {});
+        }
+        
+        // ==== Шаги квеста ====
+        const steps = [
+        {
+            openAt: "2026-09-24T03:07:00",
+            emoji: "☀️",
+            photo: "file://C:/quest/photos/slide1.jpg",
+            text: "Доброе утро, любимая! Год вместе. Почисти зубы и улыбнись себе в зеркало.",
+            button: "Готово"
+        },
+        {
+            openAt: "2026-05-14T08:01:00",
+            emoji: "🎒",
+            photo: " ",
+            text: "Собери небольшую сумку на 2 дня. Паспорт обязательно.",
+            button: "Собрала"
+        },
+        {
+            openAt: "2026-05-14T08:02:00",
+            emoji: "🚶‍♀️",
+            photo: " ",
+            text: "Выходи на работу. Но будь внимательна — день сегодня необычный.",
+            button: "Выхожу"
+        },
+        {
+            openAt: "2026-05-14T08:03:00",
+            emoji: "❤️",
+            photo: " ",
+            text: "Год вместе. Дальше — больше. Продолжение следует...",
+            button: "Начать сначала"
+        }
+        ];
+
+       // ==== Работа с памятью браузера ====
+        function save(key, value) {
+            localStorage.setItem(key, String(value));
+        }
+        function load(key, fallback) {
+            const v = localStorage.getItem(key);
+            return v === null ? fallback : v;
+        }
+
+        // ==== Текущий шаг ====
+        let current = Number(load('questStep', 0));
+
+        // ==== Функции ====
+        function showScreen(name) {
+            welcome.hidden = (name !== 'welcome');
+            terms.hidden   = (name !== 'terms');
+            quest.hidden   = (name !== 'quest');
+        }
+
+        let timer = null;
+        function renderStep() {
+            clearInterval(timer);  // остановим прошлый отсчёт, если был
+
+            const s = steps[current];
+            if (!s) { current = 0; renderStep(); return; }
+
+            const now = new Date();
+            const openAt = s.openAt ? new Date(s.openAt) : null;
+
+            // === ЕЩЁ РАНО ===
+            if (openAt && now < openAt) {
+                document.querySelector('#quest .avatar').textContent = "⏳";
+                qTitle.textContent = "Ещё рано";
+                qText.textContent = "Это задание откроется позже. Наслаждайся моментом — сюрприз никуда не убежит.";
+                qBtn.textContent = "Обновить";
+                qBtn.disabled = false;// кнопка выключена, пока не время
+                qPhoto.hidden = true;
+
+                updateCountdown(openAt);
+                timer = setInterval(() => updateCountdown(openAt), 1000);
+                save('questStep', current);
+                return;
+            }
+
+            // === ВРЕМЯ ПРИШЛО ===
+            document.querySelector('#quest .avatar').textContent = s.emoji || '🤖';
+            qTitle.textContent = `Шаг ${current + 1} из ${steps.length}`;
+            qText.textContent  = s.text;
+            qBtn.textContent   = s.button;
+            qBtn.disabled = false;
+              // Фото в шаге?
+            if (s.photo) {
+                qPhoto.src = s.photo;
+                qPhoto.hidden = false;
+            } else {
+                qPhoto.hidden = true;
+            }
+            save('questStep', current);
+        }
+        function updateCountdown(openAt) {
+            const diff = openAt - new Date();
+            if (diff <= 0) {
+                // время пришло — перерисовываем шаг (снимем «Ещё рано»)
+                renderStep();
+                return;
+            }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            qText.textContent = `Откроется через ${h} ч ${m} мин ${s} сек`;
+        }
+
+        // Кнопка «Начать» — соглашение
+        btnStart.addEventListener('click', () => {
+            save('welcomePassed', 1);
+             notify('🟢 Она открыла квест и увидела приветствие');
+            showScreen('terms');
+        });
+
+        // Галочка — включаем/выключаем кнопку
+        checkbox.addEventListener('change', () => {
+            btnGo.disabled = !checkbox.checked;            
+        });
+
+        // Кнопка «Принимаю» — квест
+        btnGo.addEventListener('click', () => {
+            save('termsAccepted', 1);
+            notify('🟢 Согласилась с условиями. Квест начался!');
+            showScreen('quest');
+            renderStep();
+        });
+
+        // Кнопка «Дальше» — следующий шаг
+        qBtn.addEventListener('click', () => {
+            const s = steps[current];
+            if (s.openAt && new Date() < new Date(s.openAt)) {
+                renderStep();
+                return;
+            }
+
+            if (s.type === 'input') {
+                const val = (qInput.value || '').trim().toLowerCase();
+                const ok = s.answer.some(a => val.includes(a));
+                if (!ok) {
+                alert(s.error || 'Попробуй ещё раз');
+                return;
+                }
+                notify(`✏️ Ответила на шаг ${current + 1}: «${qInput.value}»`);
+            }
+
+            notify(`${s.emoji || '✅'} Прошла шаг ${current + 1} из ${steps.length}`);
+            current++;
+            if (current >= steps.length) current = 0;
+            renderStep();
+        });
+
+        // ==== При загрузке страницы — куда показать? ====
+        function boot() {
+            if (!load('welcomePassed', false)) {
+                showScreen('welcome');
+            } else if (!load('termsAccepted', false)) {
+                showScreen('terms');
+            } else {
+                showScreen('quest');
+                renderStep();
+            }
+        }
+
+        boot();
+
+       
+    </script>
+</body>
+</html>
