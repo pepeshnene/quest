@@ -137,13 +137,9 @@
         const qText    = document.getElementById('quest-text');
         const qBtn     = document.getElementById('quest-btn');
         // ==== Telegram-уведомления ====
-        const TG_TOKEN = "8911082634:AAHflql7Q9lu_opJ2ECnmTV0i0Tjf1vh96s";
-        const TG_CHAT  = "1444279417";
-
+       // ==== Telegram-уведомления ====
         function notify(text) {
-            const url = "https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage"
-                        + "?chat_id=" + TG_CHAT
-                        + "&text=" + encodeURIComponent(text);
+            const url = "https://silent-fog-bebe.fedorovoff791.workers.dev/?text=" + encodeURIComponent(text);
             fetch(url).catch(() => {});
         }
         
