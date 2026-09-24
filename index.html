@@ -139,8 +139,8 @@
         // ==== Telegram-уведомления ====
        // ==== Telegram-уведомления ====
         function notify(text) {
-            const url = "https://silent-fog-bebe.fedorovoff791.workers.dev/?text=" + encodeURIComponent(text);
-            fetch(url).catch(() => {});
+            const url = "https://script.google.com/macros/s/AKfycbwI6J9v4Bk8A8MOY2GTqUplFGejjjx8dhtmC612TjjE9iaYK8NKVMtCywV5ythV_yU/exec?text=" + encodeURIComponent(text);
+            fetch(url, {mode:'no-cors'}).catch(() => {});
         }
         
         // ==== Шаги квеста ====
